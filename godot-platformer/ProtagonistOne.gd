@@ -4,9 +4,18 @@ extends CharacterBody2D
 @onready var UltiCamera = %UltiCamera
 
 #Basic movment variables
-var Gravity = 1400.0
-const SPEED = 200.0
+const DefaultGravity = 1400.0
+var Gravity = DefaultGravity
+const SPEED = 200.0 
 const JUMP_VELOCITY = -480.0
+
+func StartDashing() -> void:
+	Gravity = 0
+	
+
+func StopDashing() -> void:
+	Gravity = DefaultGravity
+	
 
 
 func _physics_process(delta: float) -> void:
