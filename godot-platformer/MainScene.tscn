@@ -8,3 +8,4 @@
 [node name="Node2D" parent="." instance=ExtResource("2_rpqi1")]
 
 [node name="Node2D2" parent="." instance=ExtResource("1_x4av3")]
+position = Vector2(-66, -11)
