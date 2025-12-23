@@ -15,9 +15,36 @@ var DIRECTION
 #Dash variables
 var IsDashing = false 
 var DASHSPEED = 800.0
-var DASHDIRECTION: float
+var DASHDIRECTION: float = 1
 var CANDASH = true
 
+#Climbing variables
+var IsCeilingClimbing = false
+var IsWallClimbing = false
+
+#Climbing Functions
+func CeilingClimb():
+	Gravity = 0
+	velocity.y = 0
+	
+	IsCeilingClimbing = true
+
+func WallClimb():
+	Gravity = 0
+	
+	IsWallClimbing = true
+	IsDashing = false
+
+#Dash functions
+func StartDashing() -> void:
+	Gravity = 0
+	velocity.y = 0
+	IsDashing = true
+
+func StopDashing() -> void:
+	Gravity = DefaultGravity
+	IsDashing = false
+	
 
 func _physics_process(delta: float) -> void:
 	# Handle Gravity
@@ -30,7 +57,7 @@ func _physics_process(delta: float) -> void:
 
 	# GodotNote - Get the input direction and handle the movement/deceleration.
 	# YellowNote - Handle direction, Handle Walking
-	if IsDashing == false:
+	if IsDashing == false and IsWallClimbing == false:
 		DIRECTION = Input.get_axis("LEFT", "RIGHT")
 		
 		if Input.is_action_pressed("LEFT"):
@@ -41,7 +68,7 @@ func _physics_process(delta: float) -> void:
 		
 	
 	#Handle Walking
-	if DIRECTION and IsDashing == false:
+	if DIRECTION and IsDashing == false and IsWallClimbing == false:
 		velocity.x = DIRECTION * SPEED
 		UltiCamera.drag_horizontal_offset = move_toward(UltiCamera.drag_horizontal_offset, 0.15 * DIRECTION, delta * 1)
 		if DIRECTION != 0 and is_on_floor():
@@ -80,6 +107,36 @@ func _physics_process(delta: float) -> void:
 	if IsDashing == true:
 		velocity.x = DASHDIRECTION * DASHSPEED
 	
+	#Handle climbing
+	if is_on_ceiling() and Input.is_action_pressed("JUMP"):
+		CeilingClimb()
+	
+	if IsCeilingClimbing == true and (Input.is_action_pressed("DOWN") or not is_on_ceiling()):
+		Gravity = DefaultGravity
+		IsCeilingClimbing = false
+	
+	if IsDashing == true and is_on_wall():
+		WallClimb()
+	
+	if IsWallClimbing == true: 
+		velocity.y = Input.get_axis("UP", "DOWN") * SPEED
+		
+		if DASHDIRECTION == 1 and Input.is_action_just_pressed("LEFT"):
+			CANDASH = true
+			Gravity = DefaultGravity
+			IsWallClimbing = false
+		
+		if DASHDIRECTION == -1 and Input.is_action_just_pressed("RIGHT"):
+			CANDASH = true
+			Gravity = DefaultGravity
+			IsWallClimbing = false
+		
+		if not is_on_wall():
+			CANDASH = true
+			Gravity = DefaultGravity
+			IsWallClimbing = false
+	
+	
 	
 		#flip sprite
 	if DIRECTION == -1:
@@ -87,14 +144,3 @@ func _physics_process(delta: float) -> void:
 	if DIRECTION == 1: 
 		%"Ulti AnimatedSprite2D".flip_h = false
 	move_and_slide()
-
-
-func StartDashing() -> void:
-	Gravity = 0
-	velocity.y = 0
-	IsDashing = true
-
-func StopDashing() -> void:
-	Gravity = DefaultGravity
-	IsDashing = false
-	
