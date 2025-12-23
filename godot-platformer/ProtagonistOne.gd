@@ -12,6 +12,10 @@ const SPEED = 200.0
 const JUMP_VELOCITY = -480.0
 var DIRECTION
 
+#CoyoteTime
+var COYOTETIME = 0
+const COYOTEDECAY = 1
+
 #Dash variables
 var IsDashing = false 
 var DASHSPEED = 800.0
@@ -47,9 +51,9 @@ func StopDashing() -> void:
 	
 
 func _physics_process(delta: float) -> void:
-	# Handle Gravity
-	print(DIRECTION)
+	# Handle Coyote Timer
 	
+	print(COYOTETIME)
 	
 	#Handle Gravity
 	if not is_on_floor():
@@ -83,6 +87,19 @@ func _physics_process(delta: float) -> void:
 	
 	
 	# Handle jump.
+	if not is_on_floor() or IsWallClimbing:
+		COYOTETIME = move_toward(COYOTETIME, 0, COYOTEDECAY * delta)
+
+	if is_on_floor() or IsWallClimbing == true:
+		COYOTETIME = 0.25
+
+	if COYOTETIME != 0 and IsDashing == false and Input.is_action_just_pressed("JUMP"):
+			velocity.y = 0
+			velocity.y += JUMP_VELOCITY
+			AnimPlayer.play("JUMP Anim")
+	
+	
+	#Dash Refresh and idle anim
 	if is_on_floor():
 		#Refresh DASH upon landing
 		CANDASH = true
@@ -90,9 +107,9 @@ func _physics_process(delta: float) -> void:
 		if DIRECTION == 0:
 			AnimPlayer.play("Idle Anim")
 		
-		if Input.is_action_just_pressed("JUMP") and IsDashing == false:
-			velocity.y += JUMP_VELOCITY
-			AnimPlayer.play("JUMP Anim")
+		
+		
+
 		
 	
 	else:
@@ -106,9 +123,14 @@ func _physics_process(delta: float) -> void:
 	
 	if IsDashing == true:
 		velocity.x = DASHDIRECTION * DASHSPEED
+		
+		if (DASHDIRECTION == 1 and Input.is_action_just_pressed("LEFT")) or (DASHDIRECTION == -1 and Input.is_action_just_pressed("RIGHT")):
+			AnimPlayer.play("JUMP Anim")
+			StopDashing()
+			IsDashing = false
 	
 	#Handle climbing
-	if is_on_ceiling() and Input.is_action_pressed("JUMP"):
+	if is_on_ceiling() and Input.is_action_pressed("JUMP") and IsWallClimbing == false:
 		CeilingClimb()
 	
 	if IsCeilingClimbing == true and (Input.is_action_pressed("DOWN") or not is_on_ceiling()):
@@ -131,7 +153,7 @@ func _physics_process(delta: float) -> void:
 			Gravity = DefaultGravity
 			IsWallClimbing = false
 		
-		if not is_on_wall():
+		if not is_on_wall() and not is_on_ceiling():
 			CANDASH = true
 			Gravity = DefaultGravity
 			IsWallClimbing = false
