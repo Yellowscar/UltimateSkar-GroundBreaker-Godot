@@ -48,16 +48,40 @@ func StartDashing() -> void:
 func StopDashing() -> void:
 	Gravity = DefaultGravity
 	IsDashing = false
-	
+
+#Dig Functions
+func StartDigging() -> void:
+	$"Digging Hitbox/CollisionShape2D".scale = Vector2(1, 1)
+	%"Digging Hitbox".set_collision_layer_value(8, true)
+	print("Hitbox Active")
+
+func StopDigging() -> void:
+	$"Digging Hitbox/CollisionShape2D".scale = Vector2(0.5, 0.5)
+	%"Digging Hitbox".set_collision_layer_value(8, false)
+	print("Hitbox Inactive")
 
 func _physics_process(delta: float) -> void:
 	# Handle Coyote Timer
 	
-	print(COYOTETIME)
+		#Digging test
+	if Input.is_action_just_pressed("TESTACTION"):
+		StartDigging()
+
+	if Input.is_action_just_released("TESTACTION"):
+		StopDigging()
+	
 	
 	#Handle Gravity
 	if not is_on_floor():
 		velocity.y += Gravity * delta
+
+	#Dash Refresh and idle anim
+	if is_on_floor():
+		#Refresh DASH upon landing
+		CANDASH = true
+		
+		if DIRECTION == 0:
+			AnimPlayer.play("Idle Anim")
 
 	# GodotNote - Get the input direction and handle the movement/deceleration.
 	# YellowNote - Handle direction, Handle Walking
@@ -99,16 +123,7 @@ func _physics_process(delta: float) -> void:
 			AnimPlayer.play("JUMP Anim")
 	
 	
-	#Dash Refresh and idle anim
-	if is_on_floor():
-		#Refresh DASH upon landing
-		CANDASH = true
-		
-		if DIRECTION == 0:
-			AnimPlayer.play("Idle Anim")
-		
-		
-		
+
 
 		
 	
@@ -130,7 +145,7 @@ func _physics_process(delta: float) -> void:
 			IsDashing = false
 	
 	#Handle climbing
-	if is_on_ceiling() and Input.is_action_pressed("JUMP") and IsWallClimbing == false:
+	if is_on_ceiling() and Input.is_action_pressed("UP") and IsWallClimbing == false:
 		CeilingClimb()
 	
 	if IsCeilingClimbing == true and (Input.is_action_pressed("DOWN") or not is_on_ceiling()):
@@ -157,7 +172,9 @@ func _physics_process(delta: float) -> void:
 			CANDASH = true
 			Gravity = DefaultGravity
 			IsWallClimbing = false
+		
 	
+
 	
 	
 		#flip sprite
