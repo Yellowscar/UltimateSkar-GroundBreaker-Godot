@@ -365,6 +365,7 @@ drag_bottom_margin = 0.1
 
 [node name="Digging Hitbox" type="Area2D" parent="Ulti Body2D" groups=["Dig Hitbox"]]
 unique_name_in_owner = true
+position = Vector2(0, 1)
 collision_layer = 0
 collision_mask = 0
 
@@ -372,3 +373,5 @@ collision_mask = 0
 position = Vector2(0, 1)
 scale = Vector2(0.5, 0.5)
 shape = SubResource("CircleShape2D_ubg76")
+
+[connection signal="area_entered" from="Ulti Body2D/Digging Hitbox" to="Ulti Body2D" method="_on_digging_hitbox_area_entered"]

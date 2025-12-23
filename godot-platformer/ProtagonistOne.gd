@@ -26,6 +26,10 @@ var CANDASH = true
 var IsCeilingClimbing = false
 var IsWallClimbing = false
 
+#Digging Variables
+var DigDirectionX
+var DigDirectionY
+
 #Climbing Functions
 func CeilingClimb():
 	Gravity = 0
@@ -51,14 +55,29 @@ func StopDashing() -> void:
 
 #Dig Functions
 func StartDigging() -> void:
-	$"Digging Hitbox/CollisionShape2D".scale = Vector2(1, 1)
+	$"Digging Hitbox/CollisionShape2D".scale = Vector2(0.8, 0.8)
 	%"Digging Hitbox".set_collision_layer_value(8, true)
+	%"Digging Hitbox".set_collision_mask_value(4, true)
+	DigDirectionX = Input.get_axis("LEFT", "RIGHT")
+	DigDirectionY = Input.get_axis("UP", "DOWN")
+	var OffsetAmount = 35
+	
+	%"Digging Hitbox".position.x = DigDirectionX * OffsetAmount
+	%"Digging Hitbox".position.y = (DigDirectionY * OffsetAmount) + 1
 	print("Hitbox Active")
 
 func StopDigging() -> void:
 	$"Digging Hitbox/CollisionShape2D".scale = Vector2(0.5, 0.5)
 	%"Digging Hitbox".set_collision_layer_value(8, false)
+	%"Digging Hitbox".set_collision_mask_value(4, false)
+	%"Digging Hitbox".position.x = 0
+	%"Digging Hitbox".position.y = 1
 	print("Hitbox Inactive")
+
+func _on_digging_hitbox_area_entered(area: Area2D) -> void:
+	if area.is_in_group("Dig Hurtbox"):
+		print("I can Dig it!")
+
 
 func _physics_process(delta: float) -> void:
 	# Handle Coyote Timer
@@ -69,6 +88,8 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_released("TESTACTION"):
 		StopDigging()
+	
+	
 	
 	
 	#Handle Gravity
