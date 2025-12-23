@@ -132,7 +132,7 @@ func _physics_process(delta: float) -> void:
 			velocity.y *= 0.5
 	
 	#Handle Dashing
-	if Input.is_action_just_pressed("ACTION") and CANDASH == true:
+	if Input.is_action_just_pressed("ACTION") and CANDASH == true and IsCeilingClimbing == false and IsWallClimbing == false:
 		AnimPlayer.play("DASH Anim")
 		CANDASH = false
 	
