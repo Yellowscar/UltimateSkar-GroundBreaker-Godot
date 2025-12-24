@@ -1,8 +1,8 @@
 [gd_scene load_steps=28 format=3 uid="uid://c5u2ifmxcbup0"]
 
 [ext_resource type="Texture2D" uid="uid://b1xljdqticrri" path="res://Godot PixelSize (3).png" id="1_4qofc"]
-[ext_resource type="Script" uid="uid://bpo83d1cr1ge6" path="res://ProtagonistOne.gd" id="1_mkce7"]
 [ext_resource type="Texture2D" uid="uid://by7cj47d2n8q2" path="res://Sprites/UltiProtoFrame0012.png" id="1_r2j4w"]
+[ext_resource type="Script" uid="uid://bpo83d1cr1ge6" path="res://Scripts/ProtagonistOne.gd" id="1_ubg76"]
 [ext_resource type="Texture2D" uid="uid://6vpgbs66t0ia" path="res://Sprites/UltiProtoFrame0001.png" id="2_ubg76"]
 [ext_resource type="Texture2D" uid="uid://biqo5rqkelsyg" path="res://Sprites/UltiProtoFrame0003.png" id="3_7eqos"]
 [ext_resource type="Texture2D" uid="uid://bhiec554y5wv7" path="res://Sprites/UltiProtoFrame0004.png" id="4_ym1id"]
@@ -341,7 +341,7 @@ libraries = {
 
 [node name="Ulti Body2D" type="CharacterBody2D" parent="."]
 unique_name_in_owner = true
-script = ExtResource("1_mkce7")
+script = ExtResource("1_ubg76")
 
 [node name="Ulti AnimatedSprite2D" type="AnimatedSprite2D" parent="Ulti Body2D"]
 unique_name_in_owner = true

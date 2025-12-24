@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c7a60nhmlikcn"]
 
-[ext_resource type="Script" uid="uid://biya3j0vxhpss" path="res://tile_dig_box.gd" id="1_kmghv"]
+[ext_resource type="Script" uid="uid://biya3j0vxhpss" path="res://Scripts/tile_dig_box.gd" id="1_kmghv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dxpfn"]
 
