@@ -6,7 +6,7 @@ extends CharacterBody2D
 @onready var AnimPlayer = %"Ulti Animation Player"
 
 #PlayerState
-enum PlayerStates {Normal, Dashing, WallClimbing, CeilingClimbing}
+enum PlayerStates {Normal, Dashing, WallClimbing, CeilingClimbing, Digging}
 var CurrentPlayerState = PlayerStates.Normal
 
 #Basic movment variables
@@ -34,7 +34,7 @@ func WalkingFunc():
 	if DIRECTION and (CurrentPlayerState == PlayerStates.Normal or CurrentPlayerState == PlayerStates.CeilingClimbing):
 		velocity.x = DIRECTION * SPEED
 		UltiCamera.drag_horizontal_offset = move_toward(UltiCamera.drag_horizontal_offset, 0.15 * DIRECTION, get_process_delta_time() * 1)
-		if DIRECTION != 0 and is_on_floor():
+		if DIRECTION != 0 and is_on_floor() and CurrentPlayerState != PlayerStates.Digging:
 			AnimPlayer.play("WALK Anim")
 	else:
 		if CurrentPlayerState != PlayerStates.Dashing:
@@ -63,43 +63,78 @@ func CeilingClimb():
 func WallClimb():
 	Gravity = 0
 	
-	CurrentPlayerState = PlayerStates.WallClimbing
 	AnimPlayer.stop()
+	CurrentPlayerState = PlayerStates.WallClimbing
 
 #Dash functions
 func StartDashing() -> void:
 	Gravity = 0
 	velocity.y = 0
 	CurrentPlayerState = PlayerStates.Dashing
+	await get_tree().create_timer(0.333).timeout
+	if CurrentPlayerState == PlayerStates.Dashing:
+		StopDashing()
 
 func StopDashing() -> void:
 	Gravity = DefaultGravity
 	CurrentPlayerState = PlayerStates.Normal
 
 #Dig Functions
-func StartDigging() -> void:
-	$"Digging Hitbox/CollisionShape2D".scale = Vector2(0.65, 0.65)
-	%"Digging Hitbox".set_collision_layer_value(8, true)
-	%"Digging Hitbox".set_collision_mask_value(4, true)
+# Would've named this StartDigging but I f#cked up when 
+# doing the testing funciton and was too lazy to change it back
+
+const OffsetAmount = 35
+
+var DigHurtboxDetected = false
+func DownDigTest():
+	%"DigDetection Box".scale = Vector2(0.8, 0.8)
+	%"DigDetection Box".set_collision_mask_value(4, true)
 	DigDirectionX = Input.get_axis("LEFT", "RIGHT")
 	DigDirectionY = Input.get_axis("UP", "DOWN")
-	var OffsetAmount = 35
+	
+	%"DigDetection Box".position.x = DigDirectionX * OffsetAmount
+	%"DigDetection Box".position.y = (DigDirectionY * OffsetAmount) + 1
+	
+	await get_tree().create_timer(0.2).timeout
+	CurrentPlayerState = PlayerStates.Normal
+	StopDigging()
+
+func _on_dig_detection_box_area_entered(area: Area2D) -> void:
+	if area.is_in_group("Dig Hurtbox"):
+		CurrentPlayerState = PlayerStates.Digging
+		DigDirectionX = Input.get_axis("LEFT", "RIGHT")
+		DigDirectionY = Input.get_axis("UP", "DOWN")
+		$"Digging Hitbox/CollisionShape2D".scale = Vector2(1, 1)
+		%"Digging Hitbox".position.x = DigDirectionX * OffsetAmount
+		%"Digging Hitbox".position.y = (DigDirectionY * OffsetAmount) + 1
+		%"Digging Hitbox".set_collision_layer_value(8, true)
+		
+		Gravity = 0
+		await get_tree().create_timer(0.05).timeout
+		velocity.x = DigDirectionX * DASHSPEED
+		velocity.y = DigDirectionY * DASHSPEED
+
+func StartDigging() -> void:
+	$"Digging Hitbox/CollisionShape2D".scale = Vector2(0.8, 0.8)
+	%"Digging Hitbox".set_collision_layer_value(8, true)
+	DigDirectionX = Input.get_axis("LEFT", "RIGHT")
+	DigDirectionY = Input.get_axis("UP", "DOWN")
 	
 	%"Digging Hitbox".position.x = DigDirectionX * OffsetAmount
 	%"Digging Hitbox".position.y = (DigDirectionY * OffsetAmount) + 1
 	print("Hitbox Active")
 
 func StopDigging() -> void:
+	Gravity = DefaultGravity
 	$"Digging Hitbox/CollisionShape2D".scale = Vector2(0.5, 0.5)
 	%"Digging Hitbox".set_collision_layer_value(8, false)
-	%"Digging Hitbox".set_collision_mask_value(4, false)
+	%"DigDetection Box".position.x = 0
+	%"DigDetection Box".position.y = 1
 	%"Digging Hitbox".position.x = 0
 	%"Digging Hitbox".position.y = 1
+	%"DigDetection Box".set_collision_mask_value(4, false)
+	
 	print("Hitbox Inactive")
-
-func _on_digging_hitbox_area_entered(area: Area2D) -> void:
-	if area.is_in_group("Dig Hurtbox"):
-		print("I can Dig it!")
 
 
 func _physics_process(delta: float) -> void:
@@ -111,8 +146,23 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_released("TESTACTION"):
 		StopDigging()
+
+
 	
+	#Handle Digging
+	if Input.is_action_just_pressed("ACTION") and Input.is_action_pressed("DOWN") and is_on_floor():
+		DownDigTest()
 	
+	if Input.is_action_just_pressed("ACTION") and Input.is_action_pressed("UP") and (is_on_ceiling() or CurrentPlayerState == PlayerStates.Digging):
+		DownDigTest()
+	
+	if Input.is_action_just_pressed("ACTION") and ((DASHDIRECTION == -1 and Input.is_action_pressed("LEFT") and CurrentPlayerState == PlayerStates.WallClimbing) or (DASHDIRECTION == 1 and Input.is_action_pressed("RIGHT") and CurrentPlayerState == PlayerStates.WallClimbing)):
+		DownDigTest()
+	
+	if is_on_floor() and CurrentPlayerState == PlayerStates.Digging:
+		CurrentPlayerState = PlayerStates.Normal
+		Gravity = DefaultGravity
+		
 	
 	
 	#Handle Gravity
@@ -120,7 +170,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y += Gravity * delta
 
 	#Dash Refresh and idle anim
-	if is_on_floor():
+	if is_on_floor() and CurrentPlayerState != PlayerStates.Digging:
 		#Refresh DASH upon landing
 		CANDASH = true
 		
@@ -156,7 +206,8 @@ func _physics_process(delta: float) -> void:
 			velocity.y *= 0.5
 	
 	#Handle Dashing
-	if Input.is_action_just_pressed("ACTION") and CANDASH == true and CurrentPlayerState == PlayerStates.Normal:
+	if Input.is_action_just_pressed("ACTION") and not Input.is_action_pressed("DOWN") and CANDASH == true and CurrentPlayerState == PlayerStates.Normal:
+		StartDashing()
 		AnimPlayer.play("DASH Anim")
 		CANDASH = false
 	
@@ -167,7 +218,8 @@ func _physics_process(delta: float) -> void:
 			AnimPlayer.play("JUMP Anim")
 			StopDashing()
 			CurrentPlayerState = PlayerStates.Normal
-	
+
+		
 	#Handle climbing
 	if is_on_ceiling() and Input.is_action_pressed("UP") and CurrentPlayerState != PlayerStates.WallClimbing:
 		CeilingClimb()

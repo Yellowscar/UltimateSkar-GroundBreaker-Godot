@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://c5u2ifmxcbup0"]
+[gd_scene load_steps=29 format=3 uid="uid://c5u2ifmxcbup0"]
 
 [ext_resource type="Texture2D" uid="uid://b1xljdqticrri" path="res://Godot PixelSize (3).png" id="1_4qofc"]
 [ext_resource type="Texture2D" uid="uid://by7cj47d2n8q2" path="res://Sprites/UltiProtoFrame0012.png" id="1_r2j4w"]
@@ -44,23 +44,6 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(0, 3.755)]
-}
-tracks/2/type = "method"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Ulti Body2D")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.45),
-"transitions": PackedFloat32Array(1, 1),
-"values": [{
-"args": [],
-"method": &"StartDashing"
-}, {
-"args": [],
-"method": &"StopDashing"
-}]
 }
 
 [sub_resource type="Animation" id="Animation_r2j4w"]
@@ -328,8 +311,11 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_r2j4w"]
 radius = 19.104973
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_ubg76"]
-radius = 29.017237
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r2j4w"]
+size = Vector2(40, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ubg76"]
+size = Vector2(40, 40)
 
 [node name="Ulti Node2D" type="Node2D"]
 
@@ -371,7 +357,17 @@ collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ulti Body2D/Digging Hitbox"]
 position = Vector2(0, 1)
-scale = Vector2(0.5, 0.5)
-shape = SubResource("CircleShape2D_ubg76")
+shape = SubResource("RectangleShape2D_r2j4w")
+
+[node name="DigDetection Box" type="Area2D" parent="Ulti Body2D"]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ulti Body2D/DigDetection Box"]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_ubg76")
+debug_color = Color(0.92941177, 0.14509805, 0.56078434, 0.34901962)
 
 [connection signal="area_entered" from="Ulti Body2D/Digging Hitbox" to="Ulti Body2D" method="_on_digging_hitbox_area_entered"]
+[connection signal="area_entered" from="Ulti Body2D/DigDetection Box" to="Ulti Body2D" method="_on_dig_detection_box_area_entered"]
