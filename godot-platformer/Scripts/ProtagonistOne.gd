@@ -107,11 +107,11 @@ func DiggingFunction():
 		%"Digging Hitbox".position.y = 2
 
 func _on_digging_hitbox_area_entered(area: Area2D) -> void:
+	CurrentPlayerState = PlayerStates.Digging
 	%"Digging Hitbox".set_collision_layer_value(8, true)
 	%"Digging Hitbox".set_collision_mask_value(4, false)
 	%"Digging Hitbox".scale = Vector2(1, 1)
 	
-	CurrentPlayerState = PlayerStates.Digging
 	await get_tree().create_timer(0.05).timeout
 	velocity.x = DigDirectionX * DASHSPEED * 0.8
 	velocity.y = DigDirectionY * DASHSPEED * 0.8
@@ -167,8 +167,8 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("ACTION") and ((DASHDIRECTION == -1 and Input.is_action_pressed("LEFT") and CurrentPlayerState == PlayerStates.WallClimbing) or (DASHDIRECTION == 1 and Input.is_action_pressed("RIGHT") and CurrentPlayerState == PlayerStates.WallClimbing)):
 		DiggingFunction()
 	
-	
-	
+	if Input.is_action_just_pressed("ACTION") and CurrentPlayerState == PlayerStates.Digging:
+		DiggingFunction()
 	
 	
 	#Handle Gravity
@@ -227,13 +227,13 @@ func _physics_process(delta: float) -> void:
 
 		
 	#Handle climbing
-	if is_on_ceiling() and Input.is_action_pressed("UP") and CurrentPlayerState != PlayerStates.WallClimbing:
+	if is_on_ceiling() and Input.is_action_pressed("UP") and (CurrentPlayerState != PlayerStates.WallClimbing or CurrentPlayerState != PlayerStates.Digging):
 		CeilingClimb()
 	
 	if CurrentPlayerState == PlayerStates.CeilingClimbing and (Input.is_action_pressed("DOWN") or not is_on_ceiling()):
 		CurrentPlayerState = PlayerStates.Normal
 	
-	if (CurrentPlayerState == PlayerStates.Dashing or CurrentPlayerState == PlayerStates.Digging)  and is_on_wall():
+	if (CurrentPlayerState == PlayerStates.Dashing)  and is_on_wall():
 		WallClimb()
 	
 	if CurrentPlayerState == PlayerStates.WallClimbing: 
