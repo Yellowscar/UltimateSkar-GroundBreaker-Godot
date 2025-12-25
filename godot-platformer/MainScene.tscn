@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://bq8fcumj56utf"]
+[gd_scene load_steps=4 format=3 uid="uid://bq8fcumj56utf"]
 
 [ext_resource type="PackedScene" uid="uid://c5u2ifmxcbup0" path="res://ProtagonistOne.tscn" id="1_x4av3"]
 [ext_resource type="PackedScene" uid="uid://bknaj4y4d0k0e" path="res://ProtoLevel.tscn" id="2_rpqi1"]
+[ext_resource type="PackedScene" uid="uid://cgrtattf4mlrp" path="res://DummyBounce.tscn" id="3_rpqi1"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -9,3 +10,6 @@
 
 [node name="Player" parent="TileMap" instance=ExtResource("1_x4av3")]
 position = Vector2(-32, -98)
+
+[node name="DummyBounce" parent="TileMap" instance=ExtResource("3_rpqi1")]
+position = Vector2(212, -317)

@@ -53,6 +53,16 @@ func DirectionGet():
 		if DIRECTION == 1:
 			DASHDIRECTION = 1
 
+#Handle bouncing on enemies/objects
+func _on_jump_bounce_hitbox_area_entered(area: Area2D) -> void:
+	if Input.is_action_pressed("JUMP"):
+		velocity.y = 0
+		velocity.y += JUMP_VELOCITY * 1.4
+		AnimPlayer.play("JUMP Anim")
+	else:
+		velocity.y = 0
+		velocity.y += JUMP_VELOCITY * 0.8
+		AnimPlayer.play("JUMP Anim")
 
 #Climbing Functions
 func CeilingClimb():

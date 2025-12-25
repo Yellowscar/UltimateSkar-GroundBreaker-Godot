@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://c5u2ifmxcbup0"]
+[gd_scene load_steps=29 format=3 uid="uid://c5u2ifmxcbup0"]
 
 [ext_resource type="Texture2D" uid="uid://b1xljdqticrri" path="res://Godot PixelSize (3).png" id="1_4qofc"]
 [ext_resource type="Texture2D" uid="uid://by7cj47d2n8q2" path="res://Sprites/UltiProtoFrame0012.png" id="1_r2j4w"]
@@ -314,6 +314,9 @@ radius = 19.104973
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r2j4w"]
 size = Vector2(40, 40)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ubg76"]
+size = Vector2(40, 12)
+
 [node name="Ulti Node2D" type="Node2D"]
 
 [node name="Ulti Animation Player" type="AnimationPlayer" parent="."]
@@ -355,5 +358,18 @@ collision_mask = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ulti Body2D/Digging Hitbox"]
 position = Vector2(0, 1)
 shape = SubResource("RectangleShape2D_r2j4w")
+debug_color = Color(0.6214792, 0.53419024, 3.85046e-07, 0.41960785)
+
+[node name="JumpBounce Hitbox" type="Area2D" parent="Ulti Body2D"]
+collision_layer = 0
+collision_mask = 16
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ulti Body2D/JumpBounce Hitbox"]
+position = Vector2(0, 21)
+shape = SubResource("RectangleShape2D_ubg76")
+one_way_collision = true
+one_way_collision_margin = 0.0
+debug_color = Color(0.92144847, 5.5927932e-05, 0.69305265, 0.41960785)
 
 [connection signal="area_entered" from="Ulti Body2D/Digging Hitbox" to="Ulti Body2D" method="_on_digging_hitbox_area_entered"]
+[connection signal="area_entered" from="Ulti Body2D/JumpBounce Hitbox" to="Ulti Body2D" method="_on_jump_bounce_hitbox_area_entered"]

@@ -78,6 +78,7 @@ TESTACTION={
 2d_physics/layer_2="Enemy Layer - Punchable"
 2d_physics/layer_3="Enemy Layer Grabable"
 2d_physics/layer_4="Can I Dig? Layer"
+2d_physics/layer_5="Enemy Stompable"
 2d_physics/layer_7="\"Did it Dig?\" layer"
 2d_physics/layer_8="Digging Layer"
 

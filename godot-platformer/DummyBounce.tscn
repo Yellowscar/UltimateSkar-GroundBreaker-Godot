@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://cgrtattf4mlrp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6xoki"]
+size = Vector2(63, 20)
+
+[node name="DummyBounce" type="Node2D"]
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_6xoki")
