@@ -37,7 +37,7 @@ func WalkingFunc():
 		if DIRECTION != 0 and is_on_floor() and CurrentPlayerState != PlayerStates.Digging:
 			AnimPlayer.play("WALK Anim")
 	else:
-		if CurrentPlayerState != PlayerStates.Dashing or CurrentPlayerState != PlayerStates.Digging:
+		if CurrentPlayerState != PlayerStates.Dashing and CurrentPlayerState != PlayerStates.Digging:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
 
 # Get horizontal walking direction, as well as DASH direction... 
@@ -110,7 +110,6 @@ func _on_digging_hitbox_area_entered(area: Area2D) -> void:
 	%"Digging Hitbox".set_collision_layer_value(8, true)
 	%"Digging Hitbox".set_collision_mask_value(4, false)
 	%"Digging Hitbox".scale = Vector2(1, 1)
-	
 	
 	CurrentPlayerState = PlayerStates.Digging
 	await get_tree().create_timer(0.05).timeout
