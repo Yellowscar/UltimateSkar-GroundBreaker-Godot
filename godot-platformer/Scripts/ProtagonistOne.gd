@@ -107,28 +107,20 @@ func _on_digging_hitbox_area_entered(area: Area2D) -> void:
 	
 	CurrentPlayerState = PlayerStates.Digging
 	await get_tree().create_timer(0.05).timeout
-	velocity.x = DigDirectionX * DASHSPEED
-	velocity.y = DigDirectionY * DASHSPEED
+	velocity.x = DigDirectionX * DASHSPEED * 0.8
+	velocity.y = DigDirectionY * DASHSPEED * 0.8
 	
-	await get_tree().create_timer(0.1).timeout
+	await get_tree().create_timer(0.05).timeout
 	%"Digging Hitbox".set_collision_layer_value(8, false)
 	%"Digging Hitbox".scale = Vector2(0, 0)
 	%"Digging Hitbox".position.x = 0
 	%"Digging Hitbox".position.y = 2
-	velocity.x = DigDirectionX * DASHSPEED
-	velocity.y = DigDirectionY * DASHSPEED
 	
-	await get_tree().create_timer(0.15).timeout
-	velocity.x = DigDirectionX * DASHSPEED
-	velocity.y = DigDirectionY * DASHSPEED
 	
-	if (not is_on_ceiling() and DigDirectionY != -1) or (not is_on_floor() and DigDirectionY == 1) or (not is_on_wall() and DigDirectionX != 0):
+	if CurrentPlayerState == PlayerStates.Digging:
 		CurrentPlayerState = PlayerStates.Normal
-	else:
-		CurrentPlayerState = PlayerStates.Digging
 
 func StartDigging() -> void:
-	$"Digging Hitbox/CollisionShape2D".scale = Vector2(0.8, 0.8)
 	%"Digging Hitbox".set_collision_layer_value(8, true)
 	DigDirectionX = Input.get_axis("LEFT", "RIGHT")
 	DigDirectionY = Input.get_axis("UP", "DOWN")
@@ -138,7 +130,6 @@ func StartDigging() -> void:
 	print("Hitbox Active")
 
 func StopDigging() -> void:
-	$"Digging Hitbox/CollisionShape2D".scale = Vector2(0.5, 0.5)
 	%"Digging Hitbox".set_collision_layer_value(8, false)
 	%"Digging Hitbox".position.x = 0
 	%"Digging Hitbox".position.y = 1
@@ -236,7 +227,7 @@ func _physics_process(delta: float) -> void:
 	if CurrentPlayerState == PlayerStates.CeilingClimbing and (Input.is_action_pressed("DOWN") or not is_on_ceiling()):
 		CurrentPlayerState = PlayerStates.Normal
 	
-	if CurrentPlayerState == PlayerStates.Dashing and is_on_wall():
+	if (CurrentPlayerState == PlayerStates.Dashing or CurrentPlayerState == PlayerStates.Digging)  and is_on_wall():
 		WallClimb()
 	
 	if CurrentPlayerState == PlayerStates.WallClimbing: 
