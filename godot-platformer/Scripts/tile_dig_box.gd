@@ -8,3 +8,4 @@ func _ready() -> void:
 func _on_area_entered(area):
 	if area.is_in_group("Dig Hitbox"):
 		GlobalScript.TILESET.erase_cell(0, TilePosition)
+		queue_free()
