@@ -108,7 +108,7 @@ func _on_digging_hitbox_area_entered(area: Area2D) -> void:
 	velocity.x = DigDirectionX * DASHSPEED
 	velocity.y = DigDirectionY * DASHSPEED
 	
-	await get_tree().create_timer(0.2).timeout
+	await get_tree().create_timer(0.15).timeout
 	velocity.x = DigDirectionX * DASHSPEED
 	velocity.y = DigDirectionY * DASHSPEED
 	
@@ -138,6 +138,8 @@ func StopDigging() -> void:
 
 func _physics_process(delta: float) -> void:
 	# Handle Coyote Timer
+	
+	print(CurrentPlayerState)
 	
 		#Digging test
 	if Input.is_action_just_pressed("TESTACTION"):
