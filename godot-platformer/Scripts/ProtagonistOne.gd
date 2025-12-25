@@ -98,6 +98,13 @@ func DiggingFunction():
 	
 	%"Digging Hitbox".position.x = DigDirectionX * OffsetAmount
 	%"Digging Hitbox".position.y = (DigDirectionY * OffsetAmount) + 1
+	
+	await get_tree().create_timer(0.05).timeout
+	
+	if CurrentPlayerState != PlayerStates.Digging:
+		%"Digging Hitbox".set_collision_mask_value(4, false)
+		%"Digging Hitbox".position.x = 0
+		%"Digging Hitbox".position.y = 2
 
 func _on_digging_hitbox_area_entered(area: Area2D) -> void:
 	%"Digging Hitbox".set_collision_layer_value(8, true)
