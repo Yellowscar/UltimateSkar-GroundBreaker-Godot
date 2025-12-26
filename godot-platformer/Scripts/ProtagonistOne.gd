@@ -113,7 +113,7 @@ func _on_digging_hitbox_area_entered(area: Area2D) -> void:
 	%"Digging Hitbox".scale = Vector2(1, 1)
 	
 	await get_tree().create_timer(0.05).timeout
-	velocity.x = DigDirectionX * DASHSPEED * 0.8
+	velocity.x = DigDirectionX * DASHSPEED * 1.2
 	velocity.y = DigDirectionY * DASHSPEED * 0.8
 	
 	await get_tree().create_timer(0.05).timeout
@@ -122,7 +122,9 @@ func _on_digging_hitbox_area_entered(area: Area2D) -> void:
 	%"Digging Hitbox".position.x = 0
 	%"Digging Hitbox".position.y = 2
 	
-	
+	await get_tree().create_timer(0.05).timeout
+	if is_on_wall() and DigDirectionX != 0:
+		CurrentPlayerState = PlayerStates.WallClimbing
 	if CurrentPlayerState == PlayerStates.Digging:
 		CurrentPlayerState = PlayerStates.Normal
 
