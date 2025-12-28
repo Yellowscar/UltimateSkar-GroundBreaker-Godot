@@ -6,7 +6,7 @@ extends CharacterBody2D
 @onready var AnimPlayer = %"Ulti Animation Player"
 
 #PlayerState
-enum PlayerStates {Normal, Dashing, WallClimbing, CeilingClimbing, Digging, DirtCling, StunStart, Stunned}
+enum PlayerStates {Normal, Dashing, WallClimbing, CeilingClimbing, Digging, DirtCling, Stunned}
 var CurrentPlayerState = PlayerStates.Normal
 
 #Basic movment variables
@@ -154,12 +154,9 @@ func StunFunction() -> void:
 func _physics_process(delta: float) -> void:
 	print(CurrentPlayerState)
 	
-	if CurrentPlayerState == PlayerStates.StunStart:
-		StunFunction()
-	
 	#Testing
 	if Input.is_action_just_pressed("TESTACTION"):
-		CurrentPlayerState = PlayerStates.StunStart
+		StunFunction()
 
 	
 	#Handle Digging
