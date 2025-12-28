@@ -6,7 +6,7 @@ extends CharacterBody2D
 @onready var AnimPlayer = %"Ulti Animation Player"
 
 #PlayerState
-enum PlayerStates {Normal, Dashing, WallClimbing, CeilingClimbing, Digging, DirtCling}
+enum PlayerStates {Normal, Dashing, WallClimbing, CeilingClimbing, Digging, DirtCling, StunStart, Stunned}
 var CurrentPlayerState = PlayerStates.Normal
 
 #Basic movment variables
@@ -37,7 +37,7 @@ func WalkingFunc():
 		if DIRECTION != 0 and is_on_floor() and CurrentPlayerState != PlayerStates.Digging:
 			AnimPlayer.play("WALK Anim")
 	else:
-		if CurrentPlayerState != PlayerStates.Dashing and CurrentPlayerState != PlayerStates.Digging:
+		if CurrentPlayerState != PlayerStates.Dashing and CurrentPlayerState != PlayerStates.Digging and CurrentPlayerState != PlayerStates.Stunned:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
 
 # Get horizontal walking direction, as well as DASH direction... 
@@ -141,35 +141,25 @@ func DirtCling() -> void:
 		CurrentPlayerState = PlayerStates.Normal
 		velocity.y += JUMP_VELOCITY
 
-func StartDigging() -> void:
-	%"Digging Hitbox".set_collision_layer_value(8, true)
-	DigDirectionX = Input.get_axis("LEFT", "RIGHT")
-	DigDirectionY = Input.get_axis("UP", "DOWN")
-	
-	%"Digging Hitbox".position.x = DigDirectionX * OffsetAmount
-	%"Digging Hitbox".position.y = (DigDirectionY * OffsetAmount) + 1
-	print("Hitbox Active")
-
-func StopDigging() -> void:
-	%"Digging Hitbox".set_collision_layer_value(8, false)
-	%"Digging Hitbox".position.x = 0
-	%"Digging Hitbox".position.y = 1
-	
-	print("Hitbox Inactive")
-
+func StunFunction() -> void:
+	CurrentPlayerState = PlayerStates.Stunned
+	velocity.y = -425
+	velocity.x = DASHDIRECTION * -1 *  DASHSPEED * 0.7
+	await get_tree().create_timer(0.2).timeout
+	velocity.y = 425
+	velocity.x = DASHDIRECTION * -1 *  DASHSPEED * 0.7
+	await get_tree().create_timer(0.2).timeout
+	CurrentPlayerState = PlayerStates.Normal
 
 func _physics_process(delta: float) -> void:
-	# Handle Coyote Timer
-	
 	print(CurrentPlayerState)
 	
-		#Digging test
+	if CurrentPlayerState == PlayerStates.StunStart:
+		StunFunction()
+	
+	#Testing
 	if Input.is_action_just_pressed("TESTACTION"):
-		StartDigging()
-
-	if Input.is_action_just_released("TESTACTION"):
-		StopDigging()
-
+		CurrentPlayerState = PlayerStates.StunStart
 
 	
 	#Handle Digging
@@ -190,7 +180,7 @@ func _physics_process(delta: float) -> void:
 	
 	
 	#Handle Gravity
-	if not is_on_floor() and CurrentPlayerState == PlayerStates.Normal:
+	if not is_on_floor() and (CurrentPlayerState == PlayerStates.Normal or CurrentPlayerState == PlayerStates.Stunned):
 		velocity.y += Gravity * delta
 
 	#Dash Refresh and idle anim
