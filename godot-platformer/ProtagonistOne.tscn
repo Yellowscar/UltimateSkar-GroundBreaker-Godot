@@ -331,7 +331,7 @@ script = ExtResource("1_ubg76")
 
 [node name="Ulti AnimatedSprite2D" type="AnimatedSprite2D" parent="Ulti Body2D"]
 unique_name_in_owner = true
-position = Vector2(0, -12)
+position = Vector2(0, -11)
 sprite_frames = SubResource("SpriteFrames_7r8ui")
 animation = &"Idle"
 offset = Vector2(0, 3.755)

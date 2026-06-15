@@ -141,6 +141,7 @@ func DirtCling() -> void:
 		CurrentPlayerState = PlayerStates.Normal
 		velocity.y += JUMP_VELOCITY
 
+#Experimental, he's supposed to be knocked back kinda like Pizza Tower or Wario land. No health system.
 func StunFunction() -> void:
 	CurrentPlayerState = PlayerStates.Stunned
 	velocity.y = -425
@@ -151,6 +152,8 @@ func StunFunction() -> void:
 	await get_tree().create_timer(0.2).timeout
 	CurrentPlayerState = PlayerStates.Normal
 
+
+#Handles climbing on ceilings and walls. 
 func HandleClimbing():
 	if is_on_ceiling() and Input.is_action_pressed("UP") and (CurrentPlayerState == PlayerStates.Normal):
 		CeilingClimb()
@@ -178,8 +181,22 @@ func HandleClimbing():
 		if not is_on_wall() and not is_on_ceiling() and not is_on_floor():
 			CANDASH = true
 			CurrentPlayerState = PlayerStates.Normal
-		
 
+func HandleJump():
+	if not is_on_floor() or CurrentPlayerState == PlayerStates.WallClimbing:
+		COYOTETIME = move_toward(COYOTETIME, 0, COYOTEDECAY * get_process_delta_time())
+
+	if is_on_floor() or CurrentPlayerState == PlayerStates.WallClimbing:
+		COYOTETIME = 0.25
+
+	if COYOTETIME != 0 and CurrentPlayerState != PlayerStates.Dashing and Input.is_action_just_pressed("JUMP"):
+			velocity.y = 0
+			velocity.y += JUMP_VELOCITY
+			AnimPlayer.play("JUMP Anim")
+	
+	else:
+		if Input.is_action_just_released("JUMP") and velocity.y < 0:
+			velocity.y *= 0.5
 
 
 func _physics_process(delta: float) -> void:
@@ -190,22 +207,17 @@ func _physics_process(delta: float) -> void:
 		StunFunction()
 
 	
-	#Handle Digging
+	#Handle Digging. Absolute mess, needs the most cleaning, fixing, optimization, and so on. 
 	if CurrentPlayerState == PlayerStates.DirtCling:
 		DirtCling()
-	
 	if Input.is_action_just_pressed("ACTION") and Input.is_action_pressed("DOWN") and is_on_floor():
 		DiggingFunction()
-	
 	if Input.is_action_just_pressed("ACTION") and Input.is_action_pressed("UP") and (is_on_ceiling() or CurrentPlayerState == PlayerStates.Digging):
 		DiggingFunction()
-	
 	if Input.is_action_just_pressed("ACTION") and ((DASHDIRECTION == -1 and Input.is_action_pressed("LEFT") and CurrentPlayerState == PlayerStates.WallClimbing) or (DASHDIRECTION == 1 and Input.is_action_pressed("RIGHT") and CurrentPlayerState == PlayerStates.WallClimbing)):
 		DiggingFunction()
-	
 	if Input.is_action_just_pressed("ACTION") and CurrentPlayerState == PlayerStates.DirtCling:
 		DiggingFunction()
-	
 	
 	#Handle Gravity
 	if not is_on_floor() and (CurrentPlayerState == PlayerStates.Normal or CurrentPlayerState == PlayerStates.Stunned):
@@ -230,22 +242,7 @@ func _physics_process(delta: float) -> void:
 	
 	
 	# Handle jump.
-	if not is_on_floor() or CurrentPlayerState == PlayerStates.WallClimbing:
-		COYOTETIME = move_toward(COYOTETIME, 0, COYOTEDECAY * delta)
-
-	if is_on_floor() or CurrentPlayerState == PlayerStates.WallClimbing:
-		COYOTETIME = 0.25
-
-	if COYOTETIME != 0 and CurrentPlayerState != PlayerStates.Dashing and Input.is_action_just_pressed("JUMP"):
-			velocity.y = 0
-			velocity.y += JUMP_VELOCITY
-			AnimPlayer.play("JUMP Anim")
-	
-	
-	
-	else:
-		if Input.is_action_just_released("JUMP") and velocity.y < 0:
-			velocity.y *= 0.5
+	HandleJump()
 	
 	#Handle Dashing
 	if Input.is_action_just_pressed("ACTION") and not Input.is_action_pressed("DOWN") and CANDASH == true and CurrentPlayerState == PlayerStates.Normal:
@@ -264,10 +261,6 @@ func _physics_process(delta: float) -> void:
 		
 	#Handle climbing
 	HandleClimbing()
-	
-	
-
-	
 	
 		#flip sprite
 	if DIRECTION == -1:
