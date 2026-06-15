@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="GodotPlatformer"
+config/name="UltimateSkar GroundBreaker V2"
 run/main_scene="uid://bq8fcumj56utf"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -25,7 +25,9 @@ gdscript/stdout/print_fps=false
 
 [display]
 
-window/stretch/mode="canvas_items"
+window/size/viewport_width=512
+window/size/viewport_height=344
+window/stretch/mode="viewport"
 
 [global_group]
 
@@ -84,5 +86,7 @@ TESTACTION={
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+2d/snap/snap_2d_transforms_to_pixel=true

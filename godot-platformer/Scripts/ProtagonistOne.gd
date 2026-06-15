@@ -33,7 +33,7 @@ var DigDirectionY
 func WalkingFunc():
 	if DIRECTION and (CurrentPlayerState == PlayerStates.Normal or CurrentPlayerState == PlayerStates.CeilingClimbing):
 		velocity.x = DIRECTION * SPEED
-		UltiCamera.drag_horizontal_offset = move_toward(UltiCamera.drag_horizontal_offset, 0.15 * DIRECTION, get_process_delta_time() * 1)
+		UltiCamera.drag_horizontal_offset = move_toward(UltiCamera.drag_horizontal_offset, 1.8 * DIRECTION, get_process_delta_time() * 6)
 		if DIRECTION != 0 and is_on_floor() and CurrentPlayerState != PlayerStates.Digging:
 			AnimPlayer.play("WALK Anim")
 	else:
@@ -151,6 +151,37 @@ func StunFunction() -> void:
 	await get_tree().create_timer(0.2).timeout
 	CurrentPlayerState = PlayerStates.Normal
 
+func HandleClimbing():
+	if is_on_ceiling() and Input.is_action_pressed("UP") and (CurrentPlayerState == PlayerStates.Normal):
+		CeilingClimb()
+	
+	if is_on_wall() and CurrentPlayerState == PlayerStates.CeilingClimbing:
+		CeilingClimb()
+	
+	if CurrentPlayerState == PlayerStates.CeilingClimbing and (Input.is_action_pressed("DOWN") or (not is_on_ceiling() and not is_on_wall())):
+		CurrentPlayerState = PlayerStates.Normal
+	
+	if (CurrentPlayerState == PlayerStates.Dashing) and is_on_wall():
+		WallClimb()
+	
+	if CurrentPlayerState == PlayerStates.WallClimbing: 
+		velocity.y = Input.get_axis("UP", "DOWN") * SPEED
+		
+		if DASHDIRECTION == 1 and Input.is_action_just_pressed("LEFT"):
+			CANDASH = true
+			CurrentPlayerState = PlayerStates.Normal
+		
+		if DASHDIRECTION == -1 and Input.is_action_just_pressed("RIGHT"):
+			CANDASH = true
+			CurrentPlayerState = PlayerStates.Normal
+		
+		if not is_on_wall() and not is_on_ceiling() and not is_on_floor():
+			CANDASH = true
+			CurrentPlayerState = PlayerStates.Normal
+		
+
+
+
 func _physics_process(delta: float) -> void:
 	print(CurrentPlayerState)
 	
@@ -195,7 +226,7 @@ func _physics_process(delta: float) -> void:
 	
 	#DashCamera
 	if CurrentPlayerState == PlayerStates.Dashing:
-		UltiCamera.drag_horizontal_offset = move_toward(UltiCamera.drag_horizontal_offset, 0.60 * DASHDIRECTION, get_process_delta_time() * 2)
+		UltiCamera.drag_horizontal_offset = move_toward(UltiCamera.drag_horizontal_offset, 2 * DASHDIRECTION, get_process_delta_time() * 12)
 	
 	
 	# Handle jump.
@@ -232,33 +263,8 @@ func _physics_process(delta: float) -> void:
 
 		
 	#Handle climbing
-	if is_on_ceiling() and Input.is_action_pressed("UP") and (CurrentPlayerState == PlayerStates.Normal):
-		CeilingClimb()
+	HandleClimbing()
 	
-	if is_on_wall() and CurrentPlayerState == PlayerStates.CeilingClimbing:
-		CeilingClimb()
-	
-	if CurrentPlayerState == PlayerStates.CeilingClimbing and (Input.is_action_pressed("DOWN") or (not is_on_ceiling() and not is_on_wall())):
-		CurrentPlayerState = PlayerStates.Normal
-	
-	if (CurrentPlayerState == PlayerStates.Dashing) and is_on_wall():
-		WallClimb()
-	
-	if CurrentPlayerState == PlayerStates.WallClimbing: 
-		velocity.y = Input.get_axis("UP", "DOWN") * SPEED
-		
-		if DASHDIRECTION == 1 and Input.is_action_just_pressed("LEFT"):
-			CANDASH = true
-			CurrentPlayerState = PlayerStates.Normal
-		
-		if DASHDIRECTION == -1 and Input.is_action_just_pressed("RIGHT"):
-			CANDASH = true
-			CurrentPlayerState = PlayerStates.Normal
-		
-		if not is_on_wall() and not is_on_ceiling() and not is_on_floor():
-			CANDASH = true
-			CurrentPlayerState = PlayerStates.Normal
-		
 	
 
 	

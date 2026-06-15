@@ -344,7 +344,6 @@ shape = SubResource("CircleShape2D_r2j4w")
 
 [node name="UltiCamera" type="Camera2D" parent="Ulti Body2D"]
 unique_name_in_owner = true
-zoom = Vector2(1.4, 1.4)
 drag_vertical_enabled = true
 drag_top_margin = 0.3
 drag_bottom_margin = 0.1
